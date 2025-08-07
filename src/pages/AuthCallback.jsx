@@ -14,7 +14,8 @@ export default function AuthCallback() {
       localStorage.setItem('auth_token', token);
       
       // Get user data to check onboarding status
-      fetch('http://localhost:5001/api/auth/me', {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      fetch(`${API_URL}/api/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

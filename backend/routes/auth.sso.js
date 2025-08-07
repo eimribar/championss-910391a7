@@ -16,13 +16,15 @@ const generateToken = (userId) => {
 const handleSuccessfulAuth = (req, res) => {
   const token = generateToken(req.user.id);
   // Redirect to frontend with token
-  res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/auth/callback?token=${token}`);
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  res.redirect(`${clientUrl}/auth/callback?token=${token}`);
 };
 
 // Error redirect
 const handleAuthError = (req, res, error) => {
   const errorMessage = encodeURIComponent(error || 'Authentication failed');
-  res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/auth?error=${errorMessage}`);
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  res.redirect(`${clientUrl}/auth?error=${errorMessage}`);
 };
 
 // @route   GET /api/auth/google

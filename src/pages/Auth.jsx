@@ -32,12 +32,14 @@ export default function Auth() {
     }
   }, [searchParams, navigate]);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:5001/api/auth/google';
+    window.location.href = `${API_URL}/api/auth/google`;
   };
 
   const handleMicrosoftLogin = () => {
-    window.location.href = 'http://localhost:5001/api/auth/microsoft';
+    window.location.href = `${API_URL}/api/auth/microsoft`;
   };
 
   return (

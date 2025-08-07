@@ -1,0 +1,204 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String      @id @default(uuid())
+  email                 String      @unique
+  password              String?     // Optional - not used for SSO
+  fullName              String
+  company               String?
+  role                  Role        @default(USER)
+  onboardingCompleted   Boolean     @default(false)
+  
+  // OAuth Providers
+  googleId             String?      @unique
+  microsoftId          String?      @unique
+  linkedinId           String?      @unique
+  authProvider         String?      // 'GOOGLE', 'MICROSOFT', 'LINKEDIN'
+  profilePicture       String?
+  
+  // Subscription
+  subscriptionPlan      Plan        @default(FREE)
+  championsLimit        Int         @default(5)
+  subscriptionExpiresAt DateTime?
+  
+  // Settings
+  emailNotifications    Boolean     @default(true)
+  weeklyDigest         Boolean     @default(true)
+  instantAlerts        Boolean     @default(true)
+  
+  // Metadata
+  lastLogin            DateTime?
+  emailVerified        Boolean     @default(false)
+  resetPasswordToken   String?
+  resetPasswordExpire  DateTime?
+  
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  
+  // Relations
+  champions            Champion[]
+  
+  @@index([email])
+  @@index([googleId])
+  @@index([microsoftId])
+}
+
+model Champion {
+  id                   String      @id @default(uuid())
+  userId               String
+  user                 User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic Info
+  name                 String
+  linkedinUrl          String
+  email                String?
+  phone                String?
+  profileImage         String?
+  bio                  String?     @db.Text
+  
+  // Current Position
+  currentCompany       String?
+  currentTitle         String?
+  location             String?
+  industry             String?
+  
+  // Previous Position
+  previousCompany      String?
+  previousTitle        String?
+  
+  // Job Change Tracking
+  jobChangeStatus      JobStatus   @default(MONITORING)
+  lastChecked          DateTime    @default(now())
+  changeDetectedAt     DateTime?
+  notifiedAt           DateTime?
+  
+  // Monitoring Settings
+  monitoringActive     Boolean     @default(true)
+  checkFrequency       Frequency   @default(WEEKLY)
+  
+  // Relationship
+  relationship         Relationship @default(PROSPECT)
+  notes                String?     @db.Text
+  tags                 String[]
+  score                Int         @default(50)
+  
+  // Engagement
+  lastContactedAt      DateTime?
+  
+  // Source
+  source               Source      @default(MANUAL)
+  
+  // Soft Delete
+  isDeleted            Boolean     @default(false)
+  deletedAt            DateTime?
+  
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  
+  // Relations
+  changeHistory        ChangeHistory[]
+  engagements          Engagement[]
+  enrichedData         EnrichedData?
+  
+  @@unique([userId, linkedinUrl])
+  @@index([userId, isDeleted])
+  @@index([userId, jobChangeStatus])
+  @@index([linkedinUrl])
+}
+
+model ChangeHistory {
+  id                   String      @id @default(uuid())
+  championId           String
+  champion             Champion    @relation(fields: [championId], references: [id], onDelete: Cascade)
+  
+  detectedAt           DateTime    @default(now())
+  previousCompany      String?
+  previousTitle        String?
+  newCompany           String?
+  newTitle             String?
+  confidence           Float       @default(0.8)
+  
+  createdAt            DateTime    @default(now())
+  
+  @@index([championId])
+}
+
+model Engagement {
+  id                   String      @id @default(uuid())
+  championId           String
+  champion             Champion    @relation(fields: [championId], references: [id], onDelete: Cascade)
+  
+  date                 DateTime    @default(now())
+  type                 String      // email, call, meeting, etc.
+  notes                String?     @db.Text
+  
+  createdAt            DateTime    @default(now())
+  
+  @@index([championId])
+}
+
+model EnrichedData {
+  id                   String      @id @default(uuid())
+  championId           String      @unique
+  champion             Champion    @relation(fields: [championId], references: [id], onDelete: Cascade)
+  
+  skills               String[]
+  education            Json?       // Array of education objects
+  experience           Json?       // Array of experience objects
+  
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+}
+
+// Enums
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Plan {
+  FREE
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+enum JobStatus {
+  MONITORING
+  NEW_CHANGE_DETECTED
+  CHANGED
+  CONFIRMED
+  NO_CHANGE
+}
+
+enum Frequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum Relationship {
+  CUSTOMER
+  PROSPECT
+  PARTNER
+  COLLEAGUE
+  OTHER
+}
+
+enum Source {
+  MANUAL
+  CSV
+  EXTENSION
+  API
+  INTEGRATION
+}

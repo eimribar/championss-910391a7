@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Reset all spacing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
 /* Custom gradient for buttons */
 .coral-teal-gradient {
   background: linear-gradient(135deg, #FF7F50 0%, #4FD1C7 100%);
@@ -34,8 +55,6 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }

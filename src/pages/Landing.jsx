@@ -1,13 +1,17 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { User } from "@/api/entities";
+import { createPageUrl } from "@/utils";
 import { LogoWithText } from "@/components/ui/logo";
 import InteractiveCta from "../components/landing/InteractiveCta";
 
 export default function Landing() {
-  const handleAuthAction = (action = 'login') => {
-    // Placeholder for auth actions
-    console.log(`${action} clicked`);
+  // Remove auto-redirect for now to avoid loops
+  
+  const handleAuthAction = async (action = 'login') => {
+    // Navigate to auth page
+    window.location.href = '/auth';
   };
 
   const pageStyles = `

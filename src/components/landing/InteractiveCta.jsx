@@ -28,11 +28,11 @@ export default function InteractiveCta() {
         
         setIsProcessing(true);
         localStorage.setItem('pendingChampionUrl', inputValue);
-        // Placeholder for tracking logic
+        
+        // For now, just simulate login and redirect to dashboard
+        localStorage.setItem('mock_logged_in', 'true');
         setTimeout(() => {
-            console.log('Tracking:', inputValue);
-            setIsProcessing(false);
-            setInputValue('');
+            window.location.href = '/dashboard';
         }, 1000);
     };
 
